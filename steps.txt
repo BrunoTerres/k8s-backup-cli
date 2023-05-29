@@ -1,0 +1,24 @@
+K3S
+kubectl create namespace k3s-test
+k3s kubectl apply -f simple-rest-golang.yaml
+
+ 
+
+
+MINIO
+docker run -p 9000:9000 --name minio -e "MINIO_ACCESS_KEY=minio" -e "MINIO_SECRET_KEY=minio123" -v /mnt/data:/data minio/minio server /data
+
+ 
+
+NGINX 
+kubectl apply -f nginx/nginx.yaml
+
+ 
+
+VELERO 
+velero install \
+--provider aws \
+--plugins velero/velero-plugin-for-aws:v1.2.1 \
+--bucket kubedemo \
+--secret-file ./minio/credentials-velero \
+--backup-location-config region=minio,s3ForcePathStyle="true",s3Url=http://172.17.0.2:9000
